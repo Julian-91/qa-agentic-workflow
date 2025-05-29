@@ -7,13 +7,13 @@ from langchain_core.messages import AIMessage
 
 load_dotenv()
 
-mcp_client =MultiServerMCPClient({
+mcp_client = MultiServerMCPClient({
     "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ],
-      "transport": "stdio"
+        "command": "npx",
+        "args": [
+            "@playwright/mcp@latest"
+        ],
+        "transport": "stdio"
     }
 })
 
@@ -24,21 +24,27 @@ tools = asyncio.run(get_tools())
 
 agent = create_react_agent("gpt-4o-mini", tools)
 
-def accessibility_scan_node(state: QaWorkflowState) -> dict:
+def security_scan_node(state: QaWorkflowState) -> dict:
     url = state["url"]
     try:
         response = asyncio.run(
-            agent.ainvoke({"messages": [{"role": "user", "content": f"Execute a accessibility scan on: {url}"}]})
+            agent.ainvoke({"messages": [{"role": "user", "content": f"Execute a security scan on: {url}. "
+            "Check for: "
+            "- Insecure HTTP headers "
+            "- Mixed content "
+            "- Open directory listing "
+            "- XSS vulnerabilities "
+            "Return a concise report."}]})
         )
         messages = response["messages"]
         ai_message = next((m for m in reversed(messages) if isinstance(m, AIMessage)), None)
         scan_content = ai_message.content if ai_message else None
         return {
-            "accessibility_scan_results": scan_content,
+            "security_scan_results": scan_content,
             "errors": None
         }
     except Exception as e:
         return {
-            "accessibility_scan_results": None,
+            "security_scan_results": None,
             "errors": [str(e)]
         }

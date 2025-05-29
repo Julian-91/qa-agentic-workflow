@@ -1,6 +1,7 @@
 from typing import TypedDict, Optional, List
 
-class AccessibilityScanState(TypedDict):
+class QaWorkflowState(TypedDict):
     url: str
-    scan_results: Optional[dict]
+    accessibility_scan_results: Optional[dict]
+    security_scan_results: Optional[dict]
     errors: Optional[List[str]]

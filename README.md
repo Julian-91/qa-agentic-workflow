@@ -38,6 +38,3 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
 - Add extra agents in the `agents/` folder
 - Extend the state in `state.py`
 - Add nodes to the workflow in `main.py`
-
-## License
-MIT 
