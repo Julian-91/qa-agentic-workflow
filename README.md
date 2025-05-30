@@ -1,10 +1,11 @@
 # QA Agentic Workflow
 
-This project is a proof-of-concept for an agentic QA workflow with multiple AI agents that autonomously perform QA tasks (such as accessibility scans) on an application, orchestrated via LangGraph workflows and MCP tooling.
+This project is a proof-of-concept for an agentic QA workflow with multiple AI agents that autonomously perform QA tasks (such as accessibility scans, security scans, and test design) on an application, orchestrated via LangGraph workflows and MCP tooling.
 
 ## Features
 - Modular agent architecture with LangGraph
-- Integration with Playwright MCP server for accessibility scans
+- Integration with Playwright MCP server for accessibility and security scans
+- Test design agent that generates test cases from code and/or description
 - Use of LLMs (OpenAI, Anthropic, etc.) as reasoning engine
 - Easily extensible with extra agents/tools
 
@@ -25,14 +26,12 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
    python main.py
    ```
 2. **Result:**
-   The workflow performs an accessibility scan on the specified URL and prints the result to the console.
+   The workflow performs various QA tasks through agents and prints the result to the console.
 
 ## Structure
-- `main.py` — Entry point, defines the workflow
-- `state.py` — TypedDict for the workflow state
-- `agents/accessibility_scan.py` — Agent node for accessibility scans via MCP/Playwright
-- `requirements.txt` — Python dependencies
-- `.env` — (not in git) Contains your API keys
+- `main.py`: Entry point and workflow definition
+- `state.py`: State definitions for the workflow
+- `agents/`: Directory with agent nodes (accessibility_scan, security_scan, test_design, ...)
 
 ## Extending
 - Add extra agents in the `agents/` folder
