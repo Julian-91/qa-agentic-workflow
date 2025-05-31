@@ -5,7 +5,8 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
 ## Features
 - Modular agent architecture with LangGraph
 - Integration with Playwright MCP server for accessibility and security scans
-- Test design agent that generates test cases from code and/or description
+- GitHub agent that fetches code changes from a specific pull request and a specific issue
+- Test design agent that generates test cases from the PR diff and the issue description
 - Use of LLMs (OpenAI, Anthropic, etc.) as reasoning engine
 - Easily extensible with extra agents/tools
 
@@ -14,10 +15,11 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
    ```bash
    pip install -r requirements.txt
    ```
-2. **Ensure Node.js and npx are installed** (for Playwright MCP server)
-3. **Create a `.env` file** with your LLM API key, for example:
+2. **Ensure Node.js and npx are installed** (for Playwright MCP and GitHub MCP servers)
+3. **Create a `.env` file** with your API keys, for example:
    ```env
    OPENAI_API_KEY=sk-...yourtoken...
+   GITHUB_PERSONAL_ACCESS_TOKEN=ghp_...yourgithubtoken...
    ```
 
 ## Usage
@@ -31,7 +33,7 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
 ## Structure
 - `main.py`: Entry point and workflow definition
 - `state.py`: State definitions for the workflow
-- `agents/`: Directory with agent nodes (accessibility_scan, security_scan, test_design, ...)
+- `agents/`: Directory with agent nodes (accessibility_scan, security_scan, github_agent, test_design, ...)
 
 ## Extending
 - Add extra agents in the `agents/` folder
