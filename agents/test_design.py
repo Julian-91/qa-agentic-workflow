@@ -13,7 +13,7 @@ async def generate_testcases(code: Optional[str], description: Optional[str]) ->
     prompt = "You are a test design assistant. "
     if code and description:
         prompt += (
-            "Based on the following code diff AND issue description, generate a list of test cases. "
+            "Based on the following code diff AND issue description, generate a list of test cases. The test cases are for functional UI testing. Only create testcases that will cover the happy flow"
             "Use both sources for maximum coverage.\n\n"
             f"Code diff:\n{code}\n\nIssue description:\n{description}\n"
         )
@@ -22,9 +22,10 @@ async def generate_testcases(code: Optional[str], description: Optional[str]) ->
     elif description:
         prompt += f"Based on the following issue description, generate a list of test cases:\n{description}\n"
     prompt += (
-        "Return ONLY a JSON array, where each testcase has 'title', 'steps', and 'expected_result'."
+        "Return ONLY a JSON array, where each testcase has 'title', 'steps', and 'expected_result' and do NOT include any markdown"
     )
     response = await llm.ainvoke(prompt)
+    print(response.content)
     try:
         return json.loads(response.content)
     except Exception:

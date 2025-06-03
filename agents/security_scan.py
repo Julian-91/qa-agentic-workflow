@@ -1,4 +1,5 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.prebuilt import create_react_agent
 from state import QaWorkflowState
 import asyncio
@@ -17,34 +18,32 @@ mcp_client = MultiServerMCPClient({
     }
 })
 
-async def get_tools():
-    return await mcp_client.get_tools()
-
-tools = asyncio.run(get_tools())
-
-agent = create_react_agent("gpt-4o-mini", tools)
-
-def security_scan_node(state: QaWorkflowState) -> dict:
+async def security_scan(state: QaWorkflowState) -> dict:
     url = state["url"]
-    try:
-        response = asyncio.run(
-            agent.ainvoke({"messages": [{"role": "user", "content": f"Execute a security scan on: {url}. "
-            "Check for: "
-            "- Insecure HTTP headers "
-            "- Mixed content "
-            "- Open directory listing "
-            "- XSS vulnerabilities "
-            "Return a concise report."}]})
-        )
-        messages = response["messages"]
-        ai_message = next((m for m in reversed(messages) if isinstance(m, AIMessage)), None)
-        scan_content = ai_message.content if ai_message else None
-        return {
-            "security_scan_results": scan_content,
-            "errors": None
-        }
-    except Exception as e:
-        return {
-            "security_scan_results": None,
-            "errors": [str(e)]
-        }
+    async with mcp_client.session("playwright") as session:
+        tools = await load_mcp_tools(session)
+        agent = create_react_agent("gpt-4o-mini", tools)
+        try:
+            response = await agent.ainvoke({"messages": [{"role": "user", "content": f"Execute a security scan on: {url}. "
+                "Check for: "
+                "- Insecure HTTP headers "
+                "- Mixed content "
+                "- Open directory listing "
+                "- XSS vulnerabilities "
+                "Return a concise report."}]})
+            
+            messages = response["messages"]
+            ai_message = next((m for m in reversed(messages) if isinstance(m, AIMessage)), None)
+            scan_content = ai_message.content if ai_message else None
+            return {
+                "security_scan_results": scan_content,
+                "errors": None
+            }
+        except Exception as e:
+            return {
+                "security_scan_results": None,
+                "errors": [str(e)]
+            }
+        
+def security_scan_node(state: QaWorkflowState) -> QaWorkflowState:
+    return asyncio.run(security_scan(state))
