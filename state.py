@@ -2,6 +2,7 @@ from typing import TypedDict, Optional, List
 
 class QaWorkflowState(TypedDict):
     url: str
+    agents_needed: Optional[List[str]]
     accessibility_scan_results: Optional[dict]
     security_scan_results: Optional[dict]
     testcases: Optional[List[dict]]

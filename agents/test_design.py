@@ -1,41 +1,28 @@
 from langchain_openai import ChatOpenAI
-import asyncio
 from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
-import json
+from pydantic import BaseModel, Field
+from langgraph.prebuilt import create_react_agent
 from state import QaWorkflowState
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-4o-mini")
+class TestCase(BaseModel):
+    title: str = Field(..., description="A short, descriptive title for the test case.")
+    steps: List[str] = Field(..., description="A list of steps to execute the test case.")
+    expected_result: str = Field(..., description="The expected outcome after executing the steps.")
 
-async def generate_testcases(code: Optional[str], description: Optional[str]) -> List[dict]:
-    prompt = "You are a test design assistant. "
-    if code and description:
-        prompt += (
-            "Based on the following code diff AND issue description, generate a list of test cases. The test cases are for functional UI testing. Only create testcases that will cover the happy flow"
-            "Use both sources for maximum coverage.\n\n"
-            f"Code diff:\n{code}\n\nIssue description:\n{description}\n"
-        )
-    elif code:
-        prompt += f"Based on the following code diff, generate a list of test cases:\n{code}\n"
-    elif description:
-        prompt += f"Based on the following issue description, generate a list of test cases:\n{description}\n"
-    prompt += (
-        "Return ONLY a JSON array, where each testcase has 'title', 'steps', and 'expected_result' and do NOT include any markdown"
-    )
-    response = await llm.ainvoke(prompt)
-    print(response.content)
-    try:
-        return json.loads(response.content)
-    except Exception:
-        return [response.content]
-    
+class TestDesignAgentOutput(BaseModel):
+    testcases: List[TestCase] = Field(..., description="A list of generated test cases for the given code/issue.")
+    errors: Optional[List[str]] = Field(None, description="A list of error messages, if any occurred during test case generation.")
+
 def test_design_node(state: QaWorkflowState) -> QaWorkflowState:
     code = state.get("pr_code_changes")
     issue = state.get("github_issue")
-    description = None
-    if issue and isinstance(issue, dict):
-        description = f"{issue.get('title', '')}\n\n{issue.get('description', '')}"
-    testcases = asyncio.run(generate_testcases(code, description))
-    return {**state, "testcases": testcases}
+    llm = ChatOpenAI(model="gpt-4o-mini")
+    structured_llm = llm.with_structured_output(TestDesignAgentOutput)
+    response = structured_llm.invoke(f"Based on the following code diff and issue description, generate a list of test cases. The test cases are for functional UI testing. Only create testcases that will cover the happy flow. Use both sources for maximum coverage. Code diff: {code}. Issue description: {issue}")
+    return {
+        "testcases": response.testcases,
+        "errors": response.errors
+    }

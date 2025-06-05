@@ -1,3 +1,5 @@
 langgraph
 langchain
 langchain-openai
+langgraph-supervisor
+pydantic
