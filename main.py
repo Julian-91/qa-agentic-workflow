@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph
-from state import QaWorkflowState
+from states import QaWorkflowState
 from agents.accessibility_scan import accessibility_scan_node
 from agents.security_scan import security_scan_node
 from agents.test_design import test_design_node

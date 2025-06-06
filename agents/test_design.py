@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from langgraph.prebuilt import create_react_agent
-from state import QaWorkflowState
+from states import QaWorkflowState
 
 load_dotenv()
 

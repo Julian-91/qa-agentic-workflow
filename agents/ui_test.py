@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import asyncio
 from typing import List, Optional
 from pydantic import BaseModel, Field
-from state import QaWorkflowState
+from states import QaWorkflowState
 
 load_dotenv()
 
@@ -36,7 +36,10 @@ async def run_ui_tests(state: QaWorkflowState) -> QaWorkflowState:
         agent = create_react_agent("gpt-4o-mini", tools, response_format=UiTestAgentOutput)
         response = await agent.ainvoke({"messages": [{"role": "user", "content": f"Use the Playwright tool to execute the following UI test on {url}. Testcases to execute: {testcases}\n Return a structured response with a list of results with each executed UI test case."}]})
     structured_response = response["structured_response"]
-    return {"ui_test_results": structured_response.ui_test_results}
+    return {
+        "ui_test_results": structured_response.ui_test_results,
+        "errors": structured_response.errors
+    }
 
 def ui_test_node(state: QaWorkflowState) -> QaWorkflowState:
     return asyncio.run(run_ui_tests(state))

@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, START, END
-from state import QaWorkflowState
+from states import QaWorkflowState
 from agents.test_design import test_design_node
 from agents.github_agent import github_agent_node
 from agents.ui_test import ui_test_node
@@ -27,8 +27,6 @@ state = {
     "issue_number": 19,
     "github_issue": None,
     "pr_code_changes": None,
-    "accessibility_scan_results": None,
-    "security_scan_results": None,
     "testcases": None,
     "ui_test_results": None,
     "errors": None

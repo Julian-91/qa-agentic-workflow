@@ -3,7 +3,7 @@ from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv
 import asyncio
 from typing import Dict, Any
-from state import QaWorkflowState
+from states import QaWorkflowState
 import os
 from langchain_core.messages import AIMessage
 from pydantic import BaseModel, Field
