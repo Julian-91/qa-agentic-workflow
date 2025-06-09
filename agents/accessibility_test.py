@@ -29,17 +29,21 @@ class AccessibilityTestAgentOutput(BaseModel):
     accessibility_test_results: List[AccessibilityTestResult] = Field(..., description="A list of results for each executed accessibility test case.")
     errors: Optional[List[str]] = Field(None, description="A list of error messages, if any occurred during accessibility test execution.")
 
-async def accessibility_scan(state: QaWorkflowState) -> dict:
+async def accessibility_test(state: QaWorkflowState) -> dict:
     url = state["url"]
+    testcases = state.get("testcases_accessibility_test", [])
     async with mcp_client.session("playwright") as session:
         tools = await load_mcp_tools(session)
         agent = create_react_agent(model="gpt-4o-mini", tools=tools, response_format=AccessibilityTestAgentOutput)
-        response = await agent.ainvoke({"messages": [{"role": "user", "content": f"Execute a accessibility scan on: {url}"}]})
+        response = await agent.ainvoke({"messages": [{"role": "user", "content": f"You are an accessibility testing agent. "
+            f"Execute the following accessibility test cases on: {url}\n"
+            f"Testcases to execute: {testcases}\n"
+            "For each test case, return a result object with keys 'title', 'passed' (true/false), and 'details' (string with error or success info). "}]})
     structured_response = response["structured_response"]
     return {
         "accessibility_scan_results": structured_response.accessibility_test_results,
         "errors": structured_response.errors
     }
         
-def accessibility_scan_node(state: QaWorkflowState) -> QaWorkflowState:
-    return asyncio.run(accessibility_scan(state))
+def accessibility_test_node(state: QaWorkflowState) -> QaWorkflowState:
+    return asyncio.run(accessibility_test(state))

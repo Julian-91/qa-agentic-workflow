@@ -29,23 +29,21 @@ class SecurityTestAgentOutput(BaseModel):
     security_test_results: List[SecurityTestResult] = Field(..., description="A list of results for each executed security test case.")
     errors: Optional[List[str]] = Field(None, description="A list of error messages, if any occurred during security test execution.")
 
-async def security_scan(state: QaWorkflowState) -> dict:
+async def security_test(state: QaWorkflowState) -> dict:
     url = state["url"]
+    testcases = state.get("testcases_security_test", [])
     async with mcp_client.session("playwright") as session:
         tools = await load_mcp_tools(session)
         agent = create_react_agent(model="gpt-4o-mini", tools=tools, response_format=SecurityTestAgentOutput)
-        response = await agent.ainvoke({"messages": [{"role": "user", "content": f"Execute a security scan on: {url}. "
-            "Check for: "
-            "- Insecure HTTP headers "
-            "- Mixed content "
-            "- Open directory listing "
-            "- XSS vulnerabilities "
-            "Return a concise report with executed test cases and results."}]})
+        response = await agent.ainvoke({"messages": [{"role": "user", "content": f"You are a security testing agent. "
+            f"Execute the following security test cases on: {url}\n"
+            f"Testcases to execute: {testcases}\n"
+            "For each test case, return a result object with keys 'title', 'passed' (true/false), and 'details' (string with error or success info). "}]})
         structured_response = response["structured_response"]
         return {
             "security_scan_results": structured_response.security_test_results,
             "errors": structured_response.errors
         }
         
-def security_scan_node(state: QaWorkflowState) -> QaWorkflowState:
-    return asyncio.run(security_scan(state))
+def security_test_node(state: QaWorkflowState) -> QaWorkflowState:
+    return asyncio.run(security_test(state))
