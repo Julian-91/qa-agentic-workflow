@@ -4,9 +4,11 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
 
 ## Features
 - Modular agent architecture with LangGraph
+- **Dynamic agent selection**: The `assign_worker` agent determines which QA agents (UI, accessibility, security, etc.) should run for a given PR/issue.
+- **Conditional workflow routing**: Only the agents selected by `assign_worker` are executed, using conditional edges in the workflow.
+- **Grouped test cases per agent**: The test design agent generates test cases only for the selected agents, and these are stored in separate lists in the state (e.g., `testcases_ui_test`, `testcases_accessibility_test`, `testcases_security_test`).
 - Integration with Playwright MCP server for accessibility and security scans
 - GitHub agent that fetches code changes from a specific pull request and a specific issue
-- Test design agent that generates test cases from the PR diff and the issue description
 - Use of LLMs (OpenAI, Anthropic, etc.) as reasoning engine
 - Easily extensible with extra agents/tools
 
@@ -25,17 +27,17 @@ This project is a proof-of-concept for an agentic QA workflow with multiple AI a
 ## Usage
 1. **Start the workflow:**
    ```bash
-   python main.py
+   python ui_check_workflow.py
    ```
 2. **Result:**
-   The workflow performs various QA tasks through agents and prints the result to the console.
+   The workflow performs various QA tasks through agents and prints the result to the console. Only the agents selected by the `assign_worker` agent will run for each workflow execution.
 
 ## Structure
-- `main.py`: Entry point and workflow definition
-- `state.py`: State definitions for the workflow
-- `agents/`: Directory with agent nodes (accessibility_scan, security_scan, github_agent, test_design, ...)
+- `ui_check_workflow.py`: Main workflow definition and entry point
+- `states.py`: State definitions for the workflow (TypedDicts)
+- `agents/`: Directory with agent nodes (accessibility_scan, security_scan, github_agent, test_design, assign_worker, ...)
 
 ## Extending
 - Add extra agents in the `agents/` folder
-- Extend the state in `state.py`
-- Add nodes to the workflow in `main.py`
+- Extend the state in `states.py`
+- Add nodes to the workflow in `ui_check_workflow.py`
