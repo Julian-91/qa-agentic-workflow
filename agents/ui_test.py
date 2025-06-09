@@ -30,7 +30,7 @@ class UiTestAgentOutput(BaseModel):
 
 async def run_ui_tests(state: QaWorkflowState) -> QaWorkflowState:
     url = state.get("url")
-    testcases = state.get("testcases", [])
+    testcases = state.get("testcases_ui_test", [])
     async with mcp_client.session("playwright") as session:
         tools = await load_mcp_tools(session)
         agent = create_react_agent("gpt-4o-mini", tools, response_format=UiTestAgentOutput)
