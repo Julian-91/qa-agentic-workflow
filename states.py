@@ -15,4 +15,7 @@ class QaWorkflowState(TypedDict):
     github_issue: Optional[dict]
     pr_code_changes: Optional[str]
     ui_test_results: Optional[List[dict]]
+    accessibility_scan_results: Optional[List[dict]]
+    security_test_results: Optional[List[dict]]
     errors: Optional[List[str]]
+    report: Optional[str]
