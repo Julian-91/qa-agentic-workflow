@@ -26,7 +26,7 @@ def test_design_node(state: QaWorkflowState) -> QaWorkflowState:
     messages = [
         {"role": "system", "content": "You are a test design assistant. You are given a code diff and an issue description of a pull request. "
         "You generete test cases for the agents that are given to you."
-        "For the ui_test agent, you need to generate test cases that cover the happy flow of the functionality."
+        "For the ui_test agent, you need to generate test cases that cover the happy flow of the functionality. These test cases will be executed by a browser agent."
         "For the accessibility_test agent, you need to generate test cases that cover the accessibility of the functionality."
         "For the security_test agent, you need to generate test cases that cover the security of the functionality."
         "The test cases should be suitable for the selected agent(s) and also be added to the list of testcases for the agent."},
@@ -35,7 +35,6 @@ def test_design_node(state: QaWorkflowState) -> QaWorkflowState:
         f"Code diff: {code}. Issue description: {issue}"}
     ]
     response = structured_llm.invoke(messages)
-    print(response)
     return {
         "testcases_ui_test": response.testcases_ui_test,
         "testcases_accessibility_test": response.testcases_accessibility_test,

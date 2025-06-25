@@ -6,6 +6,7 @@ from agents.ui_test import ui_test_node
 from agents.assign_worker import assign_worker_node
 from agents.accessibility_test import accessibility_test_node
 from agents.security_test import security_test_node
+from agents.github_reporter import github_reporter_node
 from pprint import pprint
 
 
@@ -17,6 +18,7 @@ graph_builder.add_node("test_design", test_design_node)
 graph_builder.add_node("ui_test", ui_test_node)
 graph_builder.add_node("accessibility_scan", accessibility_test_node)
 graph_builder.add_node("security_scan", security_test_node)
+graph_builder.add_node("github_reporter", github_reporter_node)
 
 graph_builder.add_edge(START, "github_agent")
 graph_builder.add_edge("github_agent", "assign_worker")
@@ -26,9 +28,10 @@ graph_builder.add_conditional_edges("test_design", lambda state: state.get("agen
     "accessibility_scan": "accessibility_scan",
     "security_scan": "security_scan",
 })
-graph_builder.add_edge("ui_test", END)
-graph_builder.add_edge("accessibility_scan", END)
-graph_builder.add_edge("security_scan", END)
+graph_builder.add_edge("ui_test", "github_reporter")
+graph_builder.add_edge("accessibility_scan", "github_reporter")
+graph_builder.add_edge("security_scan", "github_reporter")
+graph_builder.add_edge("github_reporter", END)
 
 
 workflow = graph_builder.compile()

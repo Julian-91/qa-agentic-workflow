@@ -2,7 +2,6 @@ from langchain_openai import ChatOpenAI
 from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
-from langgraph.prebuilt import create_react_agent
 from states import QaWorkflowState
 
 load_dotenv()
@@ -18,7 +17,7 @@ def assign_worker_node(state: QaWorkflowState) -> QaWorkflowState:
     llm = ChatOpenAI(model="gpt-4o-mini")
     structured_llm = llm.with_structured_output(AssignWorkerAgentOutput)
     response = structured_llm.invoke("You are a QA manager. You are given a code diff and an issue description of a pull request. "
-                                     "You need to assign the appropriate agents to test the pull request. If the issue "
+                                     "You need to assign the appropriate agents to test the pull request."
                                      "The agents are: \n"
                                      "- 'accessibility_scan': this a accessibility test agent\n"
                                      "- 'security_scan': this is a security test agent\n"
