@@ -35,6 +35,7 @@ def test_design_node(state: QaWorkflowState) -> QaWorkflowState:
         f"Code diff: {code}. Issue description: {issue}"}
     ]
     response = structured_llm.invoke(messages)
+    print(response)
     return {
         "testcases_ui_test": response.testcases_ui_test,
         "testcases_accessibility_test": response.testcases_accessibility_test,

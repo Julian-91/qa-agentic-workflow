@@ -19,3 +19,4 @@ class QaWorkflowState(TypedDict):
     security_test_results: Optional[List[dict]]
     errors: Optional[List[str]]
     report: Optional[str]
+    decision: Optional[str]
